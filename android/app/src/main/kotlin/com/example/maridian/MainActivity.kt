@@ -12,21 +12,30 @@ import io.flutter.plugin.common.MethodChannel
 
 import io.flutter.embedding.android.FlutterActivity
 
+// Note that if we do changes to the Android documents or other OS specific documents we need to rebuild the code
+// Hot reloading might not work because it just reload from the flutter side
+// Not with the Android native side
 class MainActivity: FlutterActivity() {
 
   // We need to listen from the same method channel here.
+  // Flutter engine runs on top of android.
   private val CHANNEL = "com.januda.flutter/battery"
 
   // We need to configure the channel we are calling
   override fun configureFlutterEngine(@NotNull flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
+    // Registering the method channel
+    // It is recommended to only have a one channel to a project
+    // You can communicate using multiple method through this single channel
     MethodChannel(
       flutterEngine.dartExecutor.binaryMessenger,
       CHANNEL
     ).setMethodCallHandler { call, result ->
       // This method is invoked on the main thread.
       // Doing the mapping here
+      
       if (call.method == "getBatteryLevel") {
+        // If the batteryLevel > -1 ----> Indicates that there is a value coming ( starts from 0 )
         val batteryLevel = getBatteryLevel()
 
         if (batteryLevel != -1) {
